@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project ICARUS Launcher</title>
+    <style>
+        body.light-mode {
+            background-color: white;
+            color: black;
+        }
+        body.dark-mode {
+            background-color: black;
+            color: white;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+        .textbox {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 14px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .key {
+            width: 86px;
+            height: 86px;
+            background-color: #00ffff;
+            border: 5px solid #008080;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .redkey {
+            width: 86px;
+            height: 86px;
+            background-color: #ff0000;
+            border: 5px solid #800000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .greenkey {
+            width: 86px;
+            height: 86px;
+            background-color: #00ff00;
+            border: 5px solid #008000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .cancelkey {
+            width: 316px;
+            height: 86px;
+            background-color: #ff0000;
+            border: 5px solid #800000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            margin-top: 14px;
+        }
+        .key:hover {
+            background-color: #008080;
+            border: 5px solid #00ffff;
+            color: #ffffff;
+        }
+        .redkey:hover {
+            background-color: #800000;
+            border: 5px solid #ff0000;
+            color: #ffffff;
+        }
+        .greenkey:hover {
+            background-color: #008000;
+            border: 5px solid #00ff00;
+            color: #ffffff;
+        }
+        .display {
+            width: 320px;
+            height: 50px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 24px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        .cancelkey:hover {
+            background-color: #800000;
+            border: 5px solid #ff0000;
+            color: #ffffff;
+        }
+        .dark-mode .key { 
+            background-color: #000000; 
+            border: 5px solid #00ffff;
+            color: #00ffff; 
+        } 
+        .dark-mode .redkey { 
+            background-color: #000000; 
+            border: 5px solid #ff0000;
+            color: #ff0000; 
+        } 
+        .dark-mode .greenkey { 
+            background-color: #000000; 
+            border: 5px solid #00ff00;
+            color: #00ff00; 
+        } 
+        .dark-mode .cancelkey { 
+            background-color: #000000; 
+            border: 5px solid #ff0000;
+            color: #ff0000; 
+        } 
+        .dark-mode .key:hover {
+            background-color: #008080; 
+            border: 5px solid #00ffff;
+            color: #ffffff; 
+        } 
+        .dark-mode .redkey:hover { 
+            background-color: #800000; 
+            border: 5px solid #ff0000;
+            color: #ffffff;
+        } 
+        .dark-mode .greenkey:hover { 
+            background-color: #008000; 
+            border: 5px solid #00ff00;
+            color: #ffffff;
+        } 
+        .dark-mode .cancelkey:hover { 
+            background-color: #800000; 
+            border: 5px solid #ff0000;
+            color: #ffffff;
+        }
+    </style>
+    <script>
+        let CurrentPSI = 0;
+        let TargetPSI = 0;
+
+        function updateTextBoxes() {
+            document.getElementById('currentPSI').innerText = `Current PSI: ${CurrentPSI}`;
+            document.getElementById('targetPSI').innerText = `Target PSI: ${TargetPSI}`;
+        }
+
+        function showSettings() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('settingsMenu').style.display = 'flex';
+            document.getElementById('keypadMenu').style.display = 'none';
+        }
+
+        function showMainMenu() {
+            document.getElementById('settingsMenu').style.display = 'none';
+            document.getElementById('mainMenu').style.display = 'flex';
+            document.getElementById('keypadMenu').style.display = 'none';
+        }
+
+        function showKeypad() {
+            document.getElementById('settingsMenu').style.display = 'none';
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('keypadMenu').style.display = 'flex';
+            document.getElementById('display').value = 0;
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        function addToDisplay(value) {
+            let display = document.getElementById('display');
+            if (display.value == 0) {
+                display.value = value;
+            } else {
+                display.value += value;
+            }
+        }
+
+        function keypadCancel() {
+            document.getElementById('display').value = 0;
+            showMainMenu();
+        }
+
+        function keypadDelete() {
+            let keypadDisplay = document.getElementById('display');
+            if (keypadDisplay.value != 0) {
+                keypadDisplay.value = keypadDisplay.value.slice(0, -1);
+            }
+        }
+
+        function keypadEnter() {
+            let keypadReturnValue = document.getElementById('display').value;
+            if (keypadReturnValue != 0) {
+                TargetPSI = parseInt(keypadReturnValue); // Convert the value to an integer
+                updateTextBoxes(); // Update the displayed Target PSI
+                showMainMenu();
+            }
+        }
+
+        window.onload = updateTextBoxes;
+    </script>
+</head>
+<body class="light-mode">
+    <div id="mainMenu" class="container">
+        <div id="currentPSI" class="textbox">Current PSI: 0</div>
+        <div id="targetPSI" class="textbox">Target PSI: 0</div>
+        <button class="button" onclick="showKeypad()">Set PSI</button>
+        <button class="button">Pressurize</button>
+        <button class="button">Launch</button>
+        <button class="button" onclick="showSettings()">Settings</button>
+    </div>
+
+    <div id="settingsMenu" class="container" style="display: none;">
+        <div id="currentPSI" class="textbox">Current PSI: 0</div>
+        <div id="targetPSI" class="textbox">Target PSI: 0</div>
+        <div class="textbox">SSID: </div>
+        <button class="button" onclick="toggleDarkMode()">Dark Mode</button>
+        <button class="button">Countdown</button>
+        <button class="button" onclick="showMainMenu()">Return</button>
+    </div>
+
+    <div id="keypadMenu" class="container" style="display: none;">
+        <div id="currentPSI" class="textbox">Current PSI: 0</div>
+        <div id="targetPSI" class="textbox">Target PSI: 0</div>
+        <input type="text" id="display" class="display" readonly>
+
+        <div class="keypad">
+            <div class="key" onclick="addToDisplay('1')">1</div>
+            <div class="key" onclick="addToDisplay('2')">2</div>
+            <div class="key" onclick="addToDisplay('3')">3</div>
+            <div class="key" onclick="addToDisplay('4')">4</div>
+            <div class="key" onclick="addToDisplay('5')">5</div>
+            <div class="key" onclick="addToDisplay('6')">6</div>
+            <div class="key" onclick="addToDisplay('7')">7</div>
+            <div class="key" onclick="addToDisplay('8')">8</div>
+            <div class="key" onclick="addToDisplay('9')">9</div>
+            <div class="redkey" onclick="keypadDelete()">&#9003;</div>
+            <div class="key" onclick="addToDisplay('0')">0</div>
+            <div class="greenkey" onclick="keypadEnter()">&#8629;</div>
+        </div>
+        <div class="cancelkey" onclick="keypadCancel()">C A N C E L</div>
+    </div>
+</body>
+</html>
